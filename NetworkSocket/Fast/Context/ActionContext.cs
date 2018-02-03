@@ -1,10 +1,6 @@
-﻿using NetworkSocket.Core;
+using NetworkSocket.Core;
 using NetworkSocket.Exceptions;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace NetworkSocket.Fast
 {
@@ -31,7 +27,7 @@ namespace NetworkSocket.Fast
         /// <param name="context">请求上下文</param>
         /// <param name="action">Api行为</param>
         public ActionContext(RequestContext context, ApiAction action)
-            : base(context.Session, context.Packet, context.AllSessions)
+            : base(context.Session, context.Packet, context.AllSessions,context.ServiceProvider)
         {
             this.Action = action;
         }

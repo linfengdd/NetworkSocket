@@ -1,10 +1,12 @@
-﻿
+
+using System;
+
 namespace NetworkSocket
 {
     /// <summary>
     /// 表示上下文对象
     /// </summary>
-    internal class DefaultContext : IContenxt
+    class DefaultContext : IContenxt
     {   
         /// <summary>
         /// 获取或设置当前会话对象
@@ -20,5 +22,10 @@ namespace NetworkSocket
         /// 获取或设置所有会话对象
         /// </summary>
         public ISessionManager AllSessions { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IServiceProvider ServiceProvider { get; set; }
     }
 }

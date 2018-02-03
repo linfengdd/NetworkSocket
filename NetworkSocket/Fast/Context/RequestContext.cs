@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace NetworkSocket.Fast
 {
@@ -26,6 +24,10 @@ namespace NetworkSocket.Fast
         /// 获取所有会话对象
         /// </summary>
         public ISessionManager AllSessions { get; private set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public IServiceProvider ServiceProvider { get; private set; }
 
         /// <summary>
         /// 获取所有fast协议会话对象
@@ -46,11 +48,13 @@ namespace NetworkSocket.Fast
         /// <param name="session">当前会话对象</param>
         /// <param name="packet">数据包对象</param>
         /// <param name="allSessions">所有会话对象</param>
-        internal RequestContext(FastSession session, FastPacket packet, ISessionManager allSessions)
+        /// <param name="serviceProvider">service提供</param>
+        internal RequestContext(FastSession session, FastPacket packet, ISessionManager allSessions, IServiceProvider serviceProvider)
         {
             this.Session = session;
             this.Packet = packet;
             this.AllSessions = allSessions;
+            this.ServiceProvider = serviceProvider;
         }
 
         /// <summary>

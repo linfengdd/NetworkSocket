@@ -1,12 +1,7 @@
-﻿using NetworkSocket.Exceptions;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NetworkSocket
@@ -16,6 +11,7 @@ namespace NetworkSocket
     /// </summary>
     public class TcpListener : IListener
     {
+        private IServiceProvider serviceProvider;
         /// <summary>
         /// 用于监听的socket
         /// </summary>
@@ -63,6 +59,8 @@ namespace NetworkSocket
         /// </summary>
         public X509Certificate Certificate { get; private set; }
 
+
+
         /// <summary>
         /// 获取会话提供者
         /// </summary>
@@ -79,9 +77,8 @@ namespace NetworkSocket
         /// </summary>
         public TcpListener()
         {
+
         }
-
-
         /// <summary>
         /// 使用SSL安全传输
         /// </summary>
@@ -90,17 +87,12 @@ namespace NetworkSocket
         /// <exception cref="ArgumentNullException"></exception>
         public void UseSSL(X509Certificate cer)
         {
-            if (cer == null)
-            {
-                throw new ArgumentNullException();
-            }
             if (this.IsListening == true)
             {
                 throw new InvalidOperationException("实例已经IsListening，不能UseSSL");
             }
-            this.Certificate = cer;
+            this.Certificate = cer ?? throw new ArgumentNullException();
         }
-
 
         /// <summary>
         /// 使用协议中间件
@@ -113,7 +105,6 @@ namespace NetworkSocket
             this.middlewareManager.Use(middleware);
             return middleware;
         }
-
         /// <summary>
         /// 使用协议中间件
         /// </summary>
@@ -146,7 +137,14 @@ namespace NetworkSocket
         {
             this.plugManager.Use(plug);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        public void UseProvider(IServiceProvider serviceProvider) {
+            this.serviceProvider = serviceProvider;
+        }
+            
         /// <summary>
         /// 开始启动监听
         /// 如果IsListening为true，将不产生任何作用
@@ -365,7 +363,8 @@ namespace NetworkSocket
             {
                 Session = session,
                 StreamReader = session.StreamReader,
-                AllSessions = this.sessionManager
+                AllSessions = this.sessionManager,
+                ServiceProvider = this.serviceProvider
             };
         }
 

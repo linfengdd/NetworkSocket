@@ -1,14 +1,10 @@
-﻿using NetworkSocket.Core;
+using NetworkSocket.Core;
 using NetworkSocket.Exceptions;
 using NetworkSocket.Tasks;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetworkSocket.Fast
@@ -115,8 +111,7 @@ namespace NetworkSocket.Fast
             var list = new List<FastPacket>();
             while (true)
             {
-                var packet = default(FastPacket);
-                if (FastPacket.Parse(streamReader, out packet) == false)
+                if (FastPacket.Parse(streamReader, out FastPacket packet) == false)
                 {
                     return list;
                 }
@@ -135,7 +130,7 @@ namespace NetworkSocket.Fast
         /// <param name="packet">数据包</param>
         private async void ProcessPacketAsync(FastPacket packet)
         {
-            var requestContext = new RequestContext(null, packet, null);
+            var requestContext = new RequestContext(null, packet, null,null);
             if (packet.IsException == true)
             {
                 Common.SetApiActionTaskException(this.taskSetterTable, requestContext);

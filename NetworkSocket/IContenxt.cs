@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
+using System;
 
 namespace NetworkSocket
 {
@@ -25,5 +21,9 @@ namespace NetworkSocket
         /// 获取所有会话对象
         /// </summary>
         ISessionManager AllSessions { get; }
+        /// <summary>
+        /// 
+        /// </summary>
+        IServiceProvider ServiceProvider { get; }
     }
 }

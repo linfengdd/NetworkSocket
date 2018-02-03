@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 
 namespace NetworkSocket.Core
 {
@@ -16,7 +13,13 @@ namespace NetworkSocket.Core
         /// <param name="serviceType">所请求的服务或对象的类型</param>
         /// <returns></returns>
         object GetService(Type serviceType);
-
+        /// <summary>
+        /// 解析支持任意对象创建的一次注册的服务
+        /// </summary>
+        /// <param name="serviceType">所请求的服务或对象的类型</param>
+        /// <param name="provider">所请求的服务或对象的类型</param>
+        /// <returns></returns>
+        object GetService(Type serviceType, IServiceProvider provider);
         /// <summary>
         /// 结束服务实例的生命
         /// </summary>

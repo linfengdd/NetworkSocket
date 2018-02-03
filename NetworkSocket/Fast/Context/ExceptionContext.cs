@@ -1,9 +1,6 @@
-﻿using NetworkSocket.Core;
+using NetworkSocket.Core;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace NetworkSocket.Fast
 {
@@ -30,7 +27,7 @@ namespace NetworkSocket.Fast
         /// <param name="context">请求上下文</param>
         /// <param name="exception">异常</param>
         public ExceptionContext(ActionContext context, Exception exception)
-            : base(context.Session, context.Packet, context.AllSessions)
+            : base(context.Session, context.Packet, context.AllSessions, context.ServiceProvider)
         {
             this.Exception = exception;
         }
@@ -41,7 +38,7 @@ namespace NetworkSocket.Fast
         /// <param name="context">请求上下文</param>
         /// <param name="exception">异常</param>
         public ExceptionContext(RequestContext context, Exception exception)
-            : base(context.Session, context.Packet, context.AllSessions)
+            : base(context.Session, context.Packet, context.AllSessions, context.ServiceProvider)
         {
             this.Exception = exception;
         }

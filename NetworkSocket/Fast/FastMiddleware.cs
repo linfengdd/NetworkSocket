@@ -1,16 +1,10 @@
-﻿using NetworkSocket.Core;
+using NetworkSocket.Core;
 using NetworkSocket.Exceptions;
 using NetworkSocket.Tasks;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetworkSocket.Fast
@@ -86,17 +80,19 @@ namespace NetworkSocket.Fast
 
             DomainAssembly.GetAssemblies().ForEach(item => this.BindService(item));
         }
-
         /// <summary>
         /// 绑定程序集下所有实现IFastApiService的服务
         /// </summary>
         /// <param name="assembly">程序集</param>
         private void BindService(Assembly assembly)
         {
+            //扫描assembly下所有fastService Action
             var fastApiServices = assembly.GetTypes().Where(item =>
                 item.IsAbstract == false
                 && item.IsInterface == false
                 && typeof(IFastApiService).IsAssignableFrom(item));
+
+
 
             foreach (var type in fastApiServices)
             {
@@ -127,8 +123,7 @@ namespace NetworkSocket.Fast
         /// <returns></returns>
         private Task OnFastRequestAsync(IContenxt context)
         {
-            var fastPacket = default(FastPacket);
-            if (FastPacket.Parse(context.StreamReader, out fastPacket) == false)
+            if (FastPacket.Parse(context.StreamReader, out FastPacket fastPacket) == false)
             {
                 return this.Next.Invoke(context);
             }
@@ -152,7 +147,7 @@ namespace NetworkSocket.Fast
 
             foreach (var packet in fastPackets)
             {
-                var requestContext = new RequestContext(fastSession, packet, context.AllSessions);
+                var requestContext = new RequestContext(fastSession, packet, context.AllSessions,context.ServiceProvider);
                 this.OnRecvFastPacketAsync(requestContext);
             }
             return TaskExtend.CompletedTask;
@@ -169,8 +164,7 @@ namespace NetworkSocket.Fast
             var list = new List<FastPacket> { fastPacket };
             while (true)
             {
-                var packet = default(FastPacket);
-                if (FastPacket.Parse(context.StreamReader, out packet) == false)
+                if (FastPacket.Parse(context.StreamReader, out FastPacket packet) == false)
                 {
                     return list;
                 }
@@ -225,6 +219,7 @@ namespace NetworkSocket.Fast
         {
             try
             {
+                //获取请求的Action
                 var action = this.GetApiAction(requestContext);
                 var actionContext = new ActionContext(requestContext, action);
                 var fastApiService = this.GetFastApiService(actionContext);
@@ -265,7 +260,13 @@ namespace NetworkSocket.Fast
             try
             {
                 var serviceType = actionContext.Action.DeclaringService;
+                var serviceProvider = actionContext.ServiceProvider;
+#if NETCOREAPP
+                var fastApiService = this.DependencyResolver.GetService(serviceType, serviceProvider) as FastApiService;
+#else
                 var fastApiService = this.DependencyResolver.GetService(serviceType) as FastApiService;
+#endif 
+
                 return fastApiService.Init(this);
             }
             catch (Exception ex)

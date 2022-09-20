@@ -138,15 +138,23 @@ namespace NetworkSocket
         /// <returns></returns>
         public virtual async Task<SocketError> ConnectAsync(EndPoint remoteEndPoint)
         {
-            var error = await this.ConnectInternalAsync(remoteEndPoint);
-            if (error == SocketError.Success)
+             try
             {
-                await this.session.AuthenticateAsync();
-                session.LoopReceiveAsync();
-            }
+                var error = await this.ConnectInternalAsync(remoteEndPoint);
+                if (error == SocketError.Success)
+                {
+                    await this.session.AuthenticateAsync();
+                    session.LoopReceiveAsync();
+                }
 
-            this.OnConnected(error);
-            return error;
+                this.OnConnected(error);
+                return error;
+
+            }
+            catch (Exception ex) {
+                this.session?.Shutdown();
+                return SocketError.SocketError;
+            }
         }
 
         /// <summary>
@@ -223,15 +231,23 @@ namespace NetworkSocket
         /// <returns></returns>
         public virtual SocketError Connect(EndPoint remoteEndPoint)
         {
-            var error = this.ConnectInternal(remoteEndPoint);
-            if (error == SocketError.Success)
+            try
             {
-                this.session.Authenticate();
-                session.LoopReceiveAsync();
+                var error = this.ConnectInternal(remoteEndPoint);
+                if (error == SocketError.Success)
+                {
+                    this.session.Authenticate();
+                    session.LoopReceiveAsync();
+                }
+                this.OnConnected(error);
+                return error;
             }
-
-            this.OnConnected(error);
-            return error;
+            catch(Exception ex) {
+                //说明有异常，并且需要设置状态为close
+                this.session?.Shutdown();
+                return SocketError.SocketError;
+            }
+          
         }
 
         /// <summary>
